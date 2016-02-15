@@ -21,7 +21,7 @@
 //
 //	***** PUT ALL YOUR CODE INSIDE main() *****
 //
-int main1( int argc, char** argv)
+int main( int argc, char** argv)
 {
 
 	char shades[MAX_SHADES] = {' ', '.', '+', '*', 'X', '%', '#', '@'};
