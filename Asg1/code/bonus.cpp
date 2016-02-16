@@ -37,7 +37,7 @@ int main( int argc, char** argv)
 	FILE *fout = fopen( argv[2], "w" );
 
     //html header
-	fprintf(fout, "<html><head><title>CSCI 3280 Asg1</title></head><body><pre>");
+    fprintf(fout, "<html><head><title>CSCI 3280 Asg1</title></head><body><body style=\"background-color:#000\"><pre>");
 
 	//  From ascii.cpp
     unsigned char R;
@@ -48,8 +48,8 @@ int main( int argc, char** argv)
         fputc('\n', fout);
         for (int x=0; x<w; x++) {
             	myBmp.getColor(x,y,R,G,B);
-                unsigned long rgb = (R<<16)|(G<<8)|B; 
-                fprintf(fout, "<font color=#%lu>", rgb);
+                //unsigned long rgb = (%04xR<<16)|(G<<8)|B; 
+                fprintf(fout, "<font color=#%02x%02x%02x>", R,G,B);
                 value = 0.299 * R + 0.587 * G + 0.114 * B;
                 if (value!=0) {
                     value = value / (255 / MAX_SHADES);
