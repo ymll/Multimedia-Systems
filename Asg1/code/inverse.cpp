@@ -45,11 +45,10 @@ int main( int argc, char** argv)
     int x=0;
     int y=0;
     unsigned char value;
-	do{
-        c = fgetc (fin);
+	while ((c = fgetc (fin)) != EOF) {
         for (int i=0; i<MAX_SHADES; i++){
           if (c==shades[i]) {
-              value = 255/MAX_SHADES * i;
+              value = 255 * i /(MAX_SHADES-1);
           }
         }
             myBmp.setColor(x,y,value,value,value);
@@ -58,11 +57,11 @@ int main( int argc, char** argv)
                 x=0;
                 y++;
             }
-    } while (c != EOF);
+    }
+
 	//	Save Bitmap file ( command line: argv[2] )	
 	myBmp.save( argv[2] );
 	fclose(fin);
-		
 	return 0;
 
 } 
