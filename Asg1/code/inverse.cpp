@@ -44,21 +44,21 @@ int main( int argc, char** argv)
 	char c;
     int x=0;
     int y=0;
-    int value=0;
+    unsigned char value;
 	do{
         c = fgetc (fin);
-        printf("c: %c\n", c);
-        /*for (int i=0; i<MAXSHADES; i++){i
+        for (int i=0; i<MAX_SHADES; i++){
           if (c==shades[i]) {
               value = 255/MAX_SHADES * i;
           }
-      }
-	  myBmp.setColor(x,y,value,value,value);
-	  x++;
-	  y++;
-      */
+        }
+            myBmp.setColor(x,y,value,value,value);
+            x++;
+            if (x>w) {
+                x=0;
+                y++;
+            }
     } while (c != EOF);
-	
 	//	Save Bitmap file ( command line: argv[2] )	
 	myBmp.save( argv[2] );
 	fclose(fin);
