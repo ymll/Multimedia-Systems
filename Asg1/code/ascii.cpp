@@ -4,6 +4,7 @@
 	Spring 2015
 	
 	Assignment 01 Skeleton
+    SID: 1155032377
 
 	ascii.cpp
 	
@@ -60,9 +61,11 @@ int main( int argc, char** argv)
                 if (value!=0) {
                     value = value / (255 / MAX_SHADES);
                 }
+                if (value>=MAX_SHADES) {
+                    value = MAX_SHADES-1;
+                }
                 printf("%c", shades[value]);
                 fputc(shades[value], fout);
-                if (ferror (fout)) printf ("Error Writing to myfile.txt\n");
         }
     }
 
