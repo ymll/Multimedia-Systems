@@ -47,7 +47,25 @@ int main( int argc, char** argv)
 	//	Use Bitmap.getColor(x,y,R,G,B) for getting color of pixel at (x,y)
 	//	Use fputc() to read character and "\n" to end your line.
 	//
-	
+    unsigned char R;
+    unsigned char G;
+    unsigned char B;
+    unsigned char value;
+    for (int y=0; y<h; y++) {
+        printf("\n");
+        fputc('\n', fout);
+        for (int x=0; x<w; x++) {
+            	myBmp.getColor(x,y,R,G,B);
+                value = 0.299 * R + 0.587 * G + 0.114 * B;
+                if (value!=0) {
+                    value = value / (255 / MAX_SHADES);
+                }
+                printf("%c", shades[value]);
+                fputc(shades[value], fout);
+                if (ferror (fout)) printf ("Error Writing to myfile.txt\n");
+        }
+    }
+
 	//	close ASCII file
 	fclose(fout);
 
