@@ -41,9 +41,23 @@ int main( int argc, char** argv)
 	//	Advice:
 	//	Use Bitmap.setColor(x,y,R,G,B) for setting color of pixel at (x,y)
 	//	Use fgetc()
-	//
-
-
+	char c;
+    int x=0;
+    int y=0;
+    int value=0;
+	do{
+        c = fgetc (fin);
+        printf("c: %c\n", c);
+        /*for (int i=0; i<MAXSHADES; i++){i
+          if (c==shades[i]) {
+              value = 255/MAX_SHADES * i;
+          }
+      }
+	  myBmp.setColor(x,y,value,value,value);
+	  x++;
+	  y++;
+      */
+    } while (c != EOF);
 	
 	//	Save Bitmap file ( command line: argv[2] )	
 	myBmp.save( argv[2] );
