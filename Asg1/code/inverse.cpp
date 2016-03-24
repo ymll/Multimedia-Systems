@@ -21,7 +21,7 @@
 //
 //	***** PUT ALL YOUR CODE INSIDE main() *****
 //
-int main1( int argc, char** argv)
+int main( int argc, char** argv)
 {
 
 	char shades[MAX_SHADES] = {' ', '.', '+', '*', 'X', '%', '#', '@'};
@@ -41,14 +41,31 @@ int main1( int argc, char** argv)
 	//	Advice:
 	//	Use Bitmap.setColor(x,y,R,G,B) for setting color of pixel at (x,y)
 	//	Use fgetc()
-	//
+	char c;
+    int count=0;
+    int x=0;
+    int y=0;
+    unsigned char value;
+	while ((c = fgetc (fin)) != EOF) {
+        if (c >= ' ') {
+           value = 0;
+           for (int i=1; i<MAX_SHADES; i++){
+               if (c==shades[i]) {
+                   value = (255 * i) /(MAX_SHADES-1);
+               }
+           }
+           myBmp.setColor(x,y,value,value,value);
+           x++;
+           if (x>=w) {
+               x=0;
+               y++;
+           }
+        }
+    }
 
-
-	
 	//	Save Bitmap file ( command line: argv[2] )	
-	myBmp.save( argv[2] );
+    myBmp.save( argv[2] );
 	fclose(fin);
-		
 	return 0;
 
 } 
