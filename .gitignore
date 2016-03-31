@@ -28,3 +28,6 @@
 *.app
 .DS_Store
 Thumbs.db
+
+# Compiled and test results
+**/temp/
