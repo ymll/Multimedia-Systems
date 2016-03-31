@@ -55,7 +55,7 @@ int main(int argc, char **argv)
             no_of_file = argc - 3;
             writefileheader(lzw_file,input_file_names,no_of_file);
             
-            /* ADD CODES HERE */
+            /* TODO ADD CODES HERE */
             
             fclose(lzw_file);
         } else
@@ -68,7 +68,7 @@ int main(int argc, char **argv)
                 no_of_file = 0;
                 readfileheader(lzw_file,&output_file_names,&no_of_file);
                 
-                /* ADD CODES HERE */
+                /* TODO ADD CODES HERE */
                 
                 fclose(lzw_file);
                 free(output_file_names);
@@ -213,7 +213,7 @@ void write_code(FILE *output, unsigned int code, unsigned int code_size)
 void compress(FILE *input, FILE *output)
 {
     
-    /* ADD CODES HERE */
+    /* TODO ADD CODES HERE */
     
 }
 
@@ -226,7 +226,7 @@ void compress(FILE *input, FILE *output)
 void decompress(FILE *input, FILE *output)
 {	
     
-    /* ADD CODES HERE */
+    /* TODO ADD CODES HERE */
     
 }
 
