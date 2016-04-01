@@ -129,6 +129,15 @@ int main(int argc, char **argv)
                 readfileheader(lzw_file,&output_file_names,&no_of_file);
 
                 /* TODO ADD CODES HERE */
+                char *tok = NULL;
+                tok = strtok(output_file_names, "\n");
+                fprintf(stderr, "file names: %s\n", output_file_names);
+                for (current_input_file = 0; current_input_file < no_of_file; current_input_file++) {
+                    FILE *f = fopen(output_file_names, "wb");
+                    decompress(lzw_file, f);
+                    fclose(f);
+                    tok = strtok(NULL, "\n");
+                }
 
                 fclose(lzw_file);
                 free(output_file_names);
@@ -265,6 +274,15 @@ void write_code(FILE *output, unsigned int code, unsigned int code_size)
 
 }
 
+void write_node_content_to_file(struct node *n, FILE *output) {
+    int len = strlen(n->content);
+    int i;
+    for(i=0; i<len; i++) {
+        fprintf(output, "%c", n->content[i]);
+        fprintf(stderr, "= Write code: %c\n", n->content[i]);
+    }
+}
+
 /*****************************************************************
  *
  * compress() - compress the source file and output the coded text
@@ -308,6 +326,34 @@ void decompress(FILE *input, FILE *output)
 {
 
     /* TODO ADD CODES HERE */
+    unsigned int cW = read_code(input, CODE_SIZE) & (MAX_DICT_SIZE - 1);
+    unsigned int pW = cW;
+    fprintf(stderr, "| Read code: %u (%c)\n", cW, cW);
 
+    if (cW != CODE_EOF) {
+        struct node *cW_dict = (dictionary + cW);
+        write_node_content_to_file(cW_dict, output);
+
+        while((cW = (read_code(input, CODE_SIZE) & (MAX_DICT_SIZE - 1))) != CODE_EOF) {
+            cW_dict = (dictionary + cW);
+            fprintf(stderr, "| Read code: %u (%c)\n", cW, cW);
+
+            if (cW < dict_size) {
+                // Pattern found
+                write_node_content_to_file(cW_dict, output);
+                char C = cW_dict->content[0];
+                struct node *P = (dictionary + pW);
+                add_new_node(P, C, TRUE);
+            } else {
+                // Pattern not found
+                struct node *P = (dictionary + pW);
+                char C = P->content[0];
+                add_new_node(P, C, TRUE);
+                write_node_content_to_file(dictionary + dict_size - 1, output);
+            }
+            pW = cW;
+        }
+        fprintf(stderr, "| Read code: %u (%c)\n", cW, cW);
+    }
 }
 
