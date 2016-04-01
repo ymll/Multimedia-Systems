@@ -25,8 +25,8 @@
 #define CODE_SIZE  12
 #define TRUE 1
 #define FALSE 0
-#define CODE_EOF 4294967295
 #define MAX_DICT_SIZE (1<<CODE_SIZE)
+#define CODE_EOF (MAX_DICT_SIZE - 1)
 
 /* function prototypes */
 unsigned int read_code(FILE*, unsigned int);
@@ -294,6 +294,7 @@ void compress(FILE *input, FILE *output)
         }
     }
     write_code(output, last_code->pos, CODE_SIZE);
+    write_code(output, CODE_EOF, CODE_SIZE);
     fprintf(stderr, "= Write code: %d (%c)\n", last_code->pos, last_code->pos);
 }
 
