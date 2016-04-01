@@ -26,7 +26,7 @@
 #define TRUE 1
 #define FALSE 0
 #define CODE_EOF 4294967295
-
+#define MAX_DICT_SIZE (1<<CODE_SIZE)
 
 /* function prototypes */
 unsigned int read_code(FILE*, unsigned int);
@@ -43,6 +43,45 @@ struct node {
     char *content;
 };
 
+struct node dictionary_root;
+struct node dictionary[MAX_DICT_SIZE];
+unsigned int dict_size;
+
+unsigned char read_buffer;
+
+char* concat(char *prefix, char suffix) {
+    int old_len = strlen(prefix);
+    char *text = (char *)malloc(sizeof(char) * (old_len + 2));
+
+    strcpy(text, prefix);
+    text[old_len] = suffix;
+    text[old_len + 1] = '\0';
+
+    return text;
+}
+
+void add_new_node(struct node *parent, char suffix) {
+    int i;
+    struct node *new_node = (dictionary + dict_size);
+
+    for(i=0; i<256; i++) {
+        new_node->next[i] = NULL;
+    }
+    new_node->content = concat(parent->content, (char)suffix);
+    parent->next[(int)suffix] = new_node;
+    dict_size++;
+}
+
+void init_dict() {
+    int i;
+
+    dict_size = 0;
+    dictionary_root.content = "";
+
+    for(i=0; i<256; i++) {
+        add_new_node(&dictionary_root, (char)i);
+    }
+}
 
 int main(int argc, char **argv)
 {
@@ -52,6 +91,8 @@ int main(int argc, char **argv)
     char **input_file_names;
     char *output_file_names;
     FILE *lzw_file;
+
+    init_dict();
 
     if (argc >= 3)
     {
@@ -231,7 +272,7 @@ void compress(FILE *input, FILE *output)
     /* TODO ADD CODES HERE */
     unsigned int code = read_code(input, CODE_SIZE);
     while((code = read_code(input, CODE_SIZE)) != CODE_EOF) {
-        printf("%u\n", code);
+        printf("%u %c %d %u\n", code, code);
     }
 }
 
