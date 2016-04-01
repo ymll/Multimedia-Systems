@@ -39,6 +39,7 @@ void decompress(FILE*, FILE*);
 
 /* Variables */
 struct node {
+    int pos;
     struct node *next[256];
     char *content;
 };
@@ -60,16 +61,19 @@ char* concat(char *prefix, char suffix) {
     return text;
 }
 
-void add_new_node(struct node *parent, char suffix) {
+void add_new_node(struct node *parent, char suffix, int is_set_content) {
     int i;
     struct node *new_node = (dictionary + dict_size);
 
     for(i=0; i<256; i++) {
         new_node->next[i] = NULL;
     }
-    new_node->content = concat(parent->content, (char)suffix);
+
+    if (is_set_content) {
+        new_node->content = concat(parent->content, (char)suffix);
+    }
+    new_node->pos = dict_size++;
     parent->next[(int)suffix] = new_node;
-    dict_size++;
 }
 
 void init_dict() {
@@ -79,7 +83,7 @@ void init_dict() {
     dictionary_root.content = "";
 
     for(i=0; i<256; i++) {
-        add_new_node(&dictionary_root, (char)i);
+        add_new_node(&dictionary_root, (char)i, TRUE);
     }
 }
 
@@ -270,10 +274,27 @@ void compress(FILE *input, FILE *output)
 {
 
     /* TODO ADD CODES HERE */
-    unsigned int code = read_code(input, CODE_SIZE);
-    while((code = read_code(input, CODE_SIZE)) != CODE_EOF) {
-        printf("%u %c %d %u\n", code, code);
+    struct node *last_code = &dictionary_root;
+    size_t byte_read = 0;
+
+    while((byte_read = fread(&read_buffer, sizeof(unsigned char), 1, input)) == 1) {
+        struct node *next_node = last_code->next[read_buffer];
+
+        fprintf(stderr, "| Read code: %c\n", read_buffer);
+
+        if (next_node == NULL) {
+            // Pattern not found
+            write_code(output, last_code->pos, CODE_SIZE);
+            fprintf(stderr, "= Write code: %d (%c)\n", last_code->pos, last_code->pos);
+            add_new_node(last_code, read_buffer, FALSE);
+            last_code = dictionary_root.next[read_buffer];
+        } else {
+            // Pattern found
+            last_code = next_node;
+        }
     }
+    write_code(output, last_code->pos, CODE_SIZE);
+    fprintf(stderr, "= Write code: %d (%c)\n", last_code->pos, last_code->pos);
 }
 
 
