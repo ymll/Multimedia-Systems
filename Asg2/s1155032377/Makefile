@@ -2,7 +2,7 @@ all:
 	rm -rf temp/
 	mkdir temp
 
-	gcc -o temp/lzw.o lzw.c -Wall
+	gcc -o temp/lzw.o lzw.c -Wall -O2
 
 	# Tests for compression
 	./temp/lzw.o -c temp/test_01_actual.lzw test/test_01_input.txt
@@ -28,11 +28,11 @@ all:
 	diff temp/test_06_actual_b.txt test/test_06_expected_b.txt -s
 
 	# Tests for big file compression
-	./temp/lzw.o -c temp/test_07_actual.lzw test/test_07_input.bmp
+	time ./temp/lzw.o -c temp/test_07_actual.lzw test/test_07_input.bmp
 	diff temp/test_07_actual.lzw test/test_07_expected.lzw -s
 
 	# Tests for big file decompression
-	./temp/lzw.o -d test/test_08_input.lzw
+	time ./temp/lzw.o -d test/test_08_input.lzw
 	diff temp/test_08_actual.bmp test/test_08_expected.bmp -s
 
 	# Tests for big file compression + decompression

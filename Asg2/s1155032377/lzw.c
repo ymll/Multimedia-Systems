@@ -62,7 +62,7 @@ void add_new_node(struct node *parent, unsigned char suffix, int is_set_content)
 
     if (is_set_content) {
         new_node->len = parent->len + 1;
-        new_node->content = (unsigned char*)malloc(sizeof(unsigned char) * new_node->len);
+        new_node->content = (unsigned char*)realloc(new_node->content, sizeof(unsigned char) * new_node->len);
         memcpy(new_node->content, parent->content, parent->len);
         new_node->content[parent->len] = suffix;
     }
@@ -84,19 +84,10 @@ void init_dict() {
 
 void clear_dict() {
     int i;
-    int j;
 
-    for(i=256; i<dict_size; i++) {
-        free(dictionary[i].content);
+    for(i=0; i<dict_size; i++) {
         memset(dictionary[i].next, 0, sizeof(dictionary[i].next));
     }
-
-    for(i=0; i<256; i++) {
-        for(j=0; j<256; j++) {
-            dictionary[i].next[j] = NULL;
-        }
-    }
-
     dict_size = 256;
 }
 
