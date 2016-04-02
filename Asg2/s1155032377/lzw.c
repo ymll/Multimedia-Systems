@@ -48,6 +48,7 @@ struct node dictionary_root;
 struct node dictionary[MAX_DICT_SIZE];
 unsigned int dict_size;
 
+int write_code_count = 0;
 unsigned char read_buffer;
 
 char* concat(char *prefix, char suffix) {
@@ -117,6 +118,10 @@ int main(int argc, char **argv)
                 fclose(f);
             }
 
+            if (write_code_count) {
+                write_code(lzw_file, 0, 8);
+            }
+
             fclose(lzw_file);
         } else
             if ( strcmp(argv[1],"-d") == 0)
@@ -130,10 +135,10 @@ int main(int argc, char **argv)
 
                 /* TODO ADD CODES HERE */
                 char *tok = NULL;
-                tok = strtok(output_file_names, "\n");
                 fprintf(stderr, "file names: %s\n", output_file_names);
+                tok = strtok(output_file_names, "\n");
                 for (current_input_file = 0; current_input_file < no_of_file; current_input_file++) {
-                    FILE *f = fopen(output_file_names, "wb");
+                    FILE *f = fopen(tok, "wb");
                     decompress(lzw_file, f);
                     fclose(f);
                     tok = strtok(NULL, "\n");
@@ -262,6 +267,7 @@ void write_code(FILE *output, unsigned int code, unsigned int code_size)
 
     output_bit_buffer |= (unsigned long) code << (32-code_size-output_bit_count);
     output_bit_count += code_size;
+    write_code_count++;
 
     while (output_bit_count >= 8) {
         putc(output_bit_buffer >> 24, output);
