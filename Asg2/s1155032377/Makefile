@@ -34,3 +34,11 @@ all:
 	# Tests for big file decompression
 	./temp/lzw.o -d test/test_08_input.lzw
 	diff temp/test_08_actual.bmp test/test_08_expected.bmp -s
+
+	# Tests for big file compression + decompression
+	cp test/test_09_input.bmp temp/test_09_actual.bmp
+	./temp/lzw.o -c temp/test_09_actual.lzw temp/test_09_actual.bmp
+	mv temp/test_09_actual.bmp temp/test_09_input.bmp
+	./temp/lzw.o -d temp/test_09_actual.lzw
+	diff temp/test_09_actual.bmp temp/test_09_input.bmp -s
+	diff temp/test_09_actual.bmp test/test_09_input.bmp -s
