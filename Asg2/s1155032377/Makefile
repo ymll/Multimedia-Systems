@@ -21,3 +21,8 @@ all:
 	# Test for multi-file compression
 	./temp/lzw.o -c temp/test_05_actual.lzw test/test_05_input_a.txt test/test_05_input_b.txt
 	diff temp/test_05_actual.lzw test/test_05_expected.lzw -s
+
+	# Test for multi-file decompression
+	./temp/lzw.o -d test/test_06_input.lzw
+	diff temp/test_06_actual_a.txt test/test_06_expected_a.txt -s
+	diff temp/test_06_actual_b.txt test/test_06_expected_b.txt -s
