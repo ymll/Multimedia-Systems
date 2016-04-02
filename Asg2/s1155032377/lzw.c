@@ -312,9 +312,9 @@ void compress(FILE *input, FILE *output)
 
     /* TODO ADD CODES HERE */
     struct node *last_code = &dictionary_root;
-    size_t byte_read = 0;
+    size_t byte_read = fread(&read_buffer, sizeof(unsigned char), 1, input);
 
-    while((byte_read = fread(&read_buffer, sizeof(unsigned char), 1, input)) == 1) {
+    while(byte_read == 1) {
         struct node *next_node = last_code->next[read_buffer];
 
         //fprintf(stderr, "| Read code: %c\n", read_buffer);
@@ -325,15 +325,7 @@ void compress(FILE *input, FILE *output)
                 write_code(output, last_code->pos, CODE_SIZE);
                 clear_dict();
                 last_code = &dictionary_root;
-                next_node = last_code->next[read_buffer];
-                if (next_node == NULL) {
-                    write_code(output, last_code->pos, CODE_SIZE);
-                    //fprintf(stderr, "= Write code: %d (%c)\n", last_code->pos, last_code->pos);
-                    add_new_node(last_code, read_buffer, FALSE);
-                    last_code = dictionary_root.next[read_buffer];
-                } else {
-                    last_code = next_node;
-                }
+                continue;
             } else {
                 write_code(output, last_code->pos, CODE_SIZE);
                 //fprintf(stderr, "= Write code: %d (%c)\n", last_code->pos, last_code->pos);
@@ -344,6 +336,8 @@ void compress(FILE *input, FILE *output)
             // Pattern found
             last_code = next_node;
         }
+
+        byte_read = fread(&read_buffer, sizeof(unsigned char), 1, input);
     }
     write_code(output, last_code->pos, CODE_SIZE);
     write_code(output, CODE_EOF, CODE_SIZE);
