@@ -25,8 +25,8 @@
 #define CODE_SIZE  12
 #define TRUE 1
 #define FALSE 0
-#define MAX_DICT_SIZE (1<<CODE_SIZE)
-#define CODE_EOF (MAX_DICT_SIZE - 1)
+#define MAX_DICT_SIZE ((1<<CODE_SIZE)-1)
+#define CODE_EOF (MAX_DICT_SIZE)
 
 /* function prototypes */
 unsigned int read_code(FILE*, unsigned int);
@@ -62,7 +62,7 @@ char* concat(char *prefix, char suffix) {
     return text;
 }
 
-void add_new_node(struct node *parent, char suffix, int is_set_content) {
+void add_new_node(struct node *parent, unsigned char suffix, int is_set_content) {
     int i;
     struct node *new_node = (dictionary + dict_size);
 
@@ -84,7 +84,7 @@ void init_dict() {
     dictionary_root.content = "";
 
     for(i=0; i<256; i++) {
-        add_new_node(&dictionary_root, (char)i, TRUE);
+        add_new_node(&dictionary_root, (unsigned char)i, TRUE);
     }
 }
 
@@ -332,7 +332,7 @@ void decompress(FILE *input, FILE *output)
 {
 
     /* TODO ADD CODES HERE */
-    unsigned int cW = read_code(input, CODE_SIZE) & (MAX_DICT_SIZE - 1);
+    unsigned int cW = read_code(input, CODE_SIZE) & MAX_DICT_SIZE;
     unsigned int pW = cW;
     fprintf(stderr, "| Read code: %u (%c)\n", cW, cW);
 
@@ -340,7 +340,7 @@ void decompress(FILE *input, FILE *output)
         struct node *cW_dict = (dictionary + cW);
         write_node_content_to_file(cW_dict, output);
 
-        while((cW = (read_code(input, CODE_SIZE) & (MAX_DICT_SIZE - 1))) != CODE_EOF) {
+        while((cW = (read_code(input, CODE_SIZE) & MAX_DICT_SIZE)) != CODE_EOF) {
             cW_dict = (dictionary + cW);
             fprintf(stderr, "| Read code: %u (%c)\n", cW, cW);
 
