@@ -68,6 +68,7 @@ void add_new_node(struct node *parent, unsigned char suffix, int is_set_content)
     }
     new_node->pos = dict_size++;
     parent->next[(int)suffix] = new_node;
+    // fprintf(stderr, "New node added: %s\n", new_node->content);
 }
 
 void init_dict() {
@@ -146,7 +147,7 @@ int main(int argc, char **argv)
 
                 /* TODO ADD CODES HERE */
                 char *tok = NULL;
-                fprintf(stderr, "file names: %s\n", output_file_names);
+                // fprintf(stderr, "file names: %s\n", output_file_names);
                 tok = strtok(output_file_names, "\n");
                 for (current_input_file = 0; current_input_file < no_of_file; current_input_file++) {
                     FILE *f = fopen(tok, "wb");
@@ -297,7 +298,7 @@ void write_node_content_to_file(struct node *n, FILE *output) {
     for(i=0; i<len; i++) {
         int c = n->content[i];
         putc(c, output);
-        fprintf(stderr, "= Write code: %c\n", n->content[i]);
+        //fprintf(stderr, "= Write code: %c\n", n->content[i]);
     }
 }
 
@@ -316,18 +317,18 @@ void compress(FILE *input, FILE *output)
     while((byte_read = fread(&read_buffer, sizeof(unsigned char), 1, input)) == 1) {
         struct node *next_node = last_code->next[read_buffer];
 
-        fprintf(stderr, "| Read code: %c\n", read_buffer);
+        //fprintf(stderr, "| Read code: %c\n", read_buffer);
 
         if (next_node == NULL) {
             // Pattern not found
             if (dict_size < MAX_DICT_SIZE) {
                 write_code(output, last_code->pos, CODE_SIZE);
-                fprintf(stderr, "= Write code: %d (%c)\n", last_code->pos, last_code->pos);
+                //fprintf(stderr, "= Write code: %d (%c)\n", last_code->pos, last_code->pos);
                 add_new_node(last_code, read_buffer, FALSE);
                 last_code = dictionary_root.next[read_buffer];
             } else {
                 clear_dict();
-                fprintf(stderr, "FULL!! \n");
+                //fprintf(stderr, "FULL!! \n");
                 last_code = dictionary_root.next[read_buffer];
             }
         } else {
@@ -337,7 +338,7 @@ void compress(FILE *input, FILE *output)
     }
     write_code(output, last_code->pos, CODE_SIZE);
     write_code(output, CODE_EOF, CODE_SIZE);
-    fprintf(stderr, "= Write code: %d (%c)\n", last_code->pos, last_code->pos);
+    //fprintf(stderr, "= Write code: %d (%c)\n", last_code->pos, last_code->pos);
 }
 
 
@@ -352,7 +353,7 @@ void decompress(FILE *input, FILE *output)
     /* TODO ADD CODES HERE */
     unsigned int cW = read_code(input, CODE_SIZE) & MAX_DICT_SIZE;
     unsigned int pW = cW;
-    fprintf(stderr, "| Read code: %u (%c)\n", cW, cW);
+    // fprintf(stderr, "| Read code: %u (%c)\n", cW, cW);
 
     if (cW != CODE_EOF) {
         struct node *cW_dict = (dictionary + cW);
@@ -360,7 +361,7 @@ void decompress(FILE *input, FILE *output)
 
         while((cW = (read_code(input, CODE_SIZE) & MAX_DICT_SIZE)) != CODE_EOF) {
             cW_dict = (dictionary + cW);
-            fprintf(stderr, "| Read code: %u (%c)\n", cW, cW);
+            // fprintf(stderr, "| Read code: %u (%c)\n", cW, cW);
 
             if (cW < dict_size) {
                 // Pattern found
@@ -377,7 +378,7 @@ void decompress(FILE *input, FILE *output)
             }
             pW = cW;
         }
-        fprintf(stderr, "| Read code: %u (%c)\n", cW, cW);
+        // fprintf(stderr, "| Read code: %u (%c)\n", cW, cW);
     }
 }
 
