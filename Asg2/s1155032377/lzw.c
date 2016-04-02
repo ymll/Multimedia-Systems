@@ -321,14 +321,23 @@ void compress(FILE *input, FILE *output)
 
         if (next_node == NULL) {
             // Pattern not found
-            if (dict_size < MAX_DICT_SIZE) {
+            if (dict_size >= MAX_DICT_SIZE) {
+                write_code(output, last_code->pos, CODE_SIZE);
+                clear_dict();
+                last_code = &dictionary_root;
+                next_node = last_code->next[read_buffer];
+                if (next_node == NULL) {
+                    write_code(output, last_code->pos, CODE_SIZE);
+                    //fprintf(stderr, "= Write code: %d (%c)\n", last_code->pos, last_code->pos);
+                    add_new_node(last_code, read_buffer, FALSE);
+                    last_code = dictionary_root.next[read_buffer];
+                } else {
+                    last_code = next_node;
+                }
+            } else {
                 write_code(output, last_code->pos, CODE_SIZE);
                 //fprintf(stderr, "= Write code: %d (%c)\n", last_code->pos, last_code->pos);
                 add_new_node(last_code, read_buffer, FALSE);
-                last_code = dictionary_root.next[read_buffer];
-            } else {
-                clear_dict();
-                //fprintf(stderr, "FULL!! \n");
                 last_code = dictionary_root.next[read_buffer];
             }
         } else {
