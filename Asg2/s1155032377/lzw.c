@@ -360,23 +360,30 @@ void decompress(FILE *input, FILE *output)
         write_node_content_to_file(cW_dict, output);
 
         while((cW = (read_code(input, CODE_SIZE) & MAX_DICT_SIZE)) != CODE_EOF) {
-            cW_dict = (dictionary + cW);
-            // fprintf(stderr, "| Read code: %u (%c)\n", cW, cW);
-
-            if (cW < dict_size) {
-                // Pattern found
+            if (dict_size >= MAX_DICT_SIZE) {
+                clear_dict();
+                pW = cW;
+                cW_dict = (dictionary + cW);
                 write_node_content_to_file(cW_dict, output);
-                char C = cW_dict->content[0];
-                struct node *P = (dictionary + pW);
-                add_new_node(P, C, TRUE);
             } else {
-                // Pattern not found
-                struct node *P = (dictionary + pW);
-                char C = P->content[0];
-                add_new_node(P, C, TRUE);
-                write_node_content_to_file(dictionary + dict_size - 1, output);
+                cW_dict = (dictionary + cW);
+                // fprintf(stderr, "| Read code: %u (%c)\n", cW, cW);
+
+                if (cW < dict_size) {
+                    // Pattern found
+                    write_node_content_to_file(cW_dict, output);
+                    char C = cW_dict->content[0];
+                    struct node *P = (dictionary + pW);
+                    add_new_node(P, C, TRUE);
+                } else {
+                    // Pattern not found
+                    struct node *P = (dictionary + pW);
+                    char C = P->content[0];
+                    add_new_node(P, C, TRUE);
+                    write_node_content_to_file(dictionary + dict_size - 1, output);
+                }
+                pW = cW;
             }
-            pW = cW;
         }
         // fprintf(stderr, "| Read code: %u (%c)\n", cW, cW);
     }
