@@ -41,7 +41,8 @@ void decompress(FILE*, FILE*);
 struct node {
     int pos;
     struct node *next[256];
-    char *content;
+    int len;
+    unsigned char *content;
 };
 
 struct node dictionary_root;
@@ -50,17 +51,6 @@ unsigned int dict_size;
 
 int write_code_count = 0;
 unsigned char read_buffer;
-
-char* concat(char *prefix, char suffix) {
-    int old_len = strlen(prefix);
-    char *text = (char *)malloc(sizeof(char) * (old_len + 2));
-
-    strcpy(text, prefix);
-    text[old_len] = suffix;
-    text[old_len + 1] = '\0';
-
-    return text;
-}
 
 void add_new_node(struct node *parent, unsigned char suffix, int is_set_content) {
     int i;
@@ -71,7 +61,10 @@ void add_new_node(struct node *parent, unsigned char suffix, int is_set_content)
     }
 
     if (is_set_content) {
-        new_node->content = concat(parent->content, (char)suffix);
+        new_node->len = parent->len + 1;
+        new_node->content = (unsigned char*)malloc(sizeof(unsigned char) * new_node->len);
+        memcpy(new_node->content, parent->content, parent->len);
+        new_node->content[parent->len] = suffix;
     }
     new_node->pos = dict_size++;
     parent->next[(int)suffix] = new_node;
@@ -81,11 +74,29 @@ void init_dict() {
     int i;
 
     dict_size = 0;
-    dictionary_root.content = "";
+    dictionary_root.content = NULL;
 
     for(i=0; i<256; i++) {
         add_new_node(&dictionary_root, (unsigned char)i, TRUE);
     }
+}
+
+void clear_dict() {
+    int i;
+    int j;
+
+    for(i=256; i<dict_size; i++) {
+        free(dictionary[i].content);
+        memset(dictionary[i].next, 0, sizeof(dictionary[i].next));
+    }
+
+    for(i=0; i<256; i++) {
+        for(j=0; j<256; j++) {
+            dictionary[i].next[j] = NULL;
+        }
+    }
+
+    dict_size = 256;
 }
 
 int main(int argc, char **argv)
@@ -281,10 +292,11 @@ void write_code(FILE *output, unsigned int code, unsigned int code_size)
 }
 
 void write_node_content_to_file(struct node *n, FILE *output) {
-    int len = strlen(n->content);
+    int len = n->len;
     int i;
     for(i=0; i<len; i++) {
-        fprintf(output, "%c", n->content[i]);
+        int c = n->content[i];
+        putc(c, output);
         fprintf(stderr, "= Write code: %c\n", n->content[i]);
     }
 }
@@ -308,10 +320,16 @@ void compress(FILE *input, FILE *output)
 
         if (next_node == NULL) {
             // Pattern not found
-            write_code(output, last_code->pos, CODE_SIZE);
-            fprintf(stderr, "= Write code: %d (%c)\n", last_code->pos, last_code->pos);
-            add_new_node(last_code, read_buffer, FALSE);
-            last_code = dictionary_root.next[read_buffer];
+            if (dict_size < MAX_DICT_SIZE) {
+                write_code(output, last_code->pos, CODE_SIZE);
+                fprintf(stderr, "= Write code: %d (%c)\n", last_code->pos, last_code->pos);
+                add_new_node(last_code, read_buffer, FALSE);
+                last_code = dictionary_root.next[read_buffer];
+            } else {
+                clear_dict();
+                fprintf(stderr, "FULL!! \n");
+                last_code = dictionary_root.next[read_buffer];
+            }
         } else {
             // Pattern found
             last_code = next_node;

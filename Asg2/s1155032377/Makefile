@@ -26,3 +26,7 @@ all:
 	./temp/lzw.o -d test/test_06_input.lzw
 	diff temp/test_06_actual_a.txt test/test_06_expected_a.txt -s
 	diff temp/test_06_actual_b.txt test/test_06_expected_b.txt -s
+
+	# Tests for big file compression
+	./temp/lzw.o -c temp/test_07_actual.lzw test/test_07_input.out
+	diff temp/test_07_actual.lzw test/test_07_expected.lzw -s
